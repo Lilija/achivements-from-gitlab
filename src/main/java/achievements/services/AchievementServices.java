@@ -16,14 +16,15 @@ public class AchievementServices{
     private AchievementRepository achievementRepository;
     @Autowired
     private GameRepository gameRepository;
-
-    public void create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException {
+//returns Id of created achievement
+    public String create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException {
         Game achievementGame = gameRepository.findOne(gameId);
         achievement.setGame(achievementGame);
         achievement.setCreated(LocalDateTime.now());
         achievement.setUpdated(LocalDateTime.now());
         if (!(this.alreadyExists(achievement))) {
             achievement = achievementRepository.save(achievement);
+            return achievement.getId();
         }
         else throw new AchievementAlreadyExistsException(achievement);
     }
