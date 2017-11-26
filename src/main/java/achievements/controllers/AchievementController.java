@@ -31,8 +31,7 @@ public class AchievementController {
     }
 
     @PostMapping("/achievements")
-    public ResponseEntity<?>
-    add (@RequestBody Achievement achievement, @PathVariable String gameId) {
+    public ResponseEntity<?> add (@RequestBody Achievement achievement, @PathVariable String gameId) {
         String createdId;
         createdId = achievementServices.create(achievement, gameId);
             if (createdId != null) {
@@ -52,7 +51,7 @@ public class AchievementController {
     @PutMapping("/achievements/{achievementId}")
     public ResponseEntity<?> updateAchievement (@RequestBody Achievement achievement,
                                                 @PathVariable String achievementId) {
-        try {
+
             achievement = achievementServices.update(achievement,achievementId);
             if (achievement.getId() != null) {
                 URI location = ServletUriComponentsBuilder
