@@ -26,9 +26,9 @@ import java.util.NoSuchElementException;
 public class AchievementController {
 
     @Autowired
-    AchievementServices achievementServices;
+   private  AchievementServices achievementServices;
     @Autowired
-    GameRepository gameRepository;
+    private GameRepository gameRepository;
 
 @GetMapping("/achievements")
     public @ResponseBody List<Achievement> listAllAchievements (@PathVariable String gameId){

@@ -1,8 +1,11 @@
 package achievements.services;
 
 import achievements.enteties.Achievement;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class AchievementAlreadyExistsException extends Throwable {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class AchievementAlreadyExistsException extends RuntimeException {
     public AchievementAlreadyExistsException(Achievement o) {
         super ("Achivement "+o.getDisplayName()+" for this game already exists");
     }

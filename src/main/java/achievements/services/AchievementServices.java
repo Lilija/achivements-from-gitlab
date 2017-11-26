@@ -56,11 +56,11 @@ public class AchievementServices{
             return this.achievementRepository.findOne(achievmentId);
         }
         catch (Exception e){
-           throw new IllegalAchievmentIdExeption();
+           throw new IllegalAchievemenExeption();
         }
     }
 //checks if achievement with same name for the same game already exists
-    public boolean alreadyExists(Achievement check) {
+    private boolean alreadyExists(Achievement check) {
         return this.achievementRepository
                 .existsByGame_idAndDisplayName(check.getGame().getId(), check.getDisplayName());
     }
