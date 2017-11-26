@@ -2,6 +2,7 @@ package achievements.services;
 
 import achievements.enteties.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import achievements.repos.AchievementRepository;
 import achievements.enteties.Achievement;
@@ -16,12 +17,15 @@ public class AchievementServices{
     private AchievementRepository achievementRepository;
     @Autowired
     private GameRepository gameRepository;
-//returns Id of created achievement
-    public String create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException {
-        Game achievementGame = gameRepository.findOne(gameId);
+//takes achievement from HTTP body and gameId from path and returns Id of created achievement
+    public String create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException, GameNotFoundException {
+        Game achievementGame = gameRepository.findById(gameId)
+                            .orElseThrow(()->new GameNotFoundException());
         achievement.setGame(achievementGame);
+        //This part should go to EventListener?
         achievement.setCreated(LocalDateTime.now());
         achievement.setUpdated(LocalDateTime.now());
+
         if (!(this.alreadyExists(achievement))) {
             achievement = achievementRepository.save(achievement);
             return achievement.getId();
@@ -29,40 +33,44 @@ public class AchievementServices{
         else throw new AchievementAlreadyExistsException(achievement);
     }
 
-    public Achievement update (Achievement updated, String updatedId) throws AchievementAlreadyExistsException {
-        updated.setUpdated(LocalDateTime.now());
-        if (!(this.alreadyExists(updated))) {
-            Achievement existsing = achievementRepository.findOne(updatedId);
-            updated.setId(updatedId);
-            updated.setCreated(existsing.getCreated());
-            return achievementRepository.save(updated);
+    public Achievement update (Achievement updAchievement, String updId)
+                                            throws AchievementAlreadyExistsException, AchievementNotFoundException {
+        //this should go to EventListener?
+        updAchievement.setUpdated(LocalDateTime.now());
+        //--------------------------------------------
+        if (!(this.alreadyExists(updAchievement))) {
+            Achievement existsing = achievementRepository.findById(updId)
+                    .orElseThrow(()->new AchievementNotFoundException());
+            //Because it will probably be changed to use DTOs:
+            updAchievement.setId(updId);
+            updAchievement.setCreated(existsing.getCreated());
+            return achievementRepository.save(updAchievement);
         }
-        else throw new AchievementAlreadyExistsException(updated);
+        else throw new AchievementAlreadyExistsException(updAchievement);
     }
 
     public void delete (String achievementId){
         achievementRepository.delete( achievementId);
     }
 //list all achivements for given game ID
-    public List<Achievement> getAll (String gameId){
+    public List<Achievement> getAllByGameSorted(String gameId){
         if(this.gameRepository.exists(gameId)) {
             return this.achievementRepository.findByGame_IdOrderByDisplayOrderAscCreatedAsc(gameId);
         }
-        else throw new IllegalGameExeption();
+        else throw new GameNotFoundException();
     }
 
     public Achievement getOne (String achievmentId){
-       try{
+        if(this.achievementRepository.exists(achievmentId)) {
             return this.achievementRepository.findOne(achievmentId);
         }
-        catch (Exception e){
-           throw new IllegalAchievemenExeption();
-        }
+        else throw new AchievementNotFoundException();
     }
 //checks if achievement with same name for the same game already exists
     private boolean alreadyExists(Achievement check) {
         return this.achievementRepository
-                .existsByGame_idAndDisplayName(check.getGame().getId(), check.getDisplayName());
+                    .achievementForGameAlreadyExists(check.getId(), check.getGame().getId(), check.getDisplayName())>0;
+
     }
 
 }

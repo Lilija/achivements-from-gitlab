@@ -2,15 +2,12 @@ package achievements.controllers;
 
 import achievements.Application;
 import achievements.enteties.Achievement;
-import achievements.enteties.Game;
-import achievements.repos.GameRepository;
-import org.apache.http.HttpResponse;
+import achievements.services.GameNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import achievements.services.AchievementAlreadyExistsException;
 import achievements.services.AchievementServices;
@@ -27,32 +24,24 @@ public class AchievementController {
 
     @Autowired
    private  AchievementServices achievementServices;
-    @Autowired
-    private GameRepository gameRepository;
 
 @GetMapping("/achievements")
     public @ResponseBody List<Achievement> listAllAchievements (@PathVariable String gameId){
-          return achievementServices.getAll(gameId);
+          return achievementServices.getAllByGameSorted(gameId);
     }
 
     @PostMapping("/achievements")
-    public ResponseEntity<?>  add (@RequestBody Achievement achievement, @PathVariable String gameId) {
+    public ResponseEntity<?>
+    add (@RequestBody Achievement achievement, @PathVariable String gameId) {
         String createdId;
-        try {
-
-            createdId = achievementServices.create(achievement, gameId);
+        createdId = achievementServices.create(achievement, gameId);
             if (createdId != null) {
                 URI location = ServletUriComponentsBuilder
                         .fromCurrentRequest().path("/{createdId}")
                         .buildAndExpand(createdId).toUri();
                 return ResponseEntity.created(location).build();
             }
-            else throw new NoSuchElementException();
-        }
-
-        catch ( AchievementAlreadyExistsException | NoSuchElementException e){
-        return ResponseEntity.noContent().build();
-        }
+            return ResponseEntity.noContent().build();
         }
 
     @GetMapping("/achievements/{achievementId}")
@@ -71,18 +60,13 @@ public class AchievementController {
                         .buildAndExpand(achievement.getId() ).toUri();
                 return ResponseEntity.created(location).build();
             }
-            else throw new NoSuchElementException();
-        }
-
-        catch ( AchievementAlreadyExistsException | NoSuchElementException e){
             return ResponseEntity.noContent().build();
-        }
         }
 
         @DeleteMapping("/achievements/{achievementId}")
         public ResponseEntity deleteAchievement (@PathVariable String achievementId) {
         achievementServices.delete(achievementId);
-            return ResponseEntity.ok("deleted");
+            return ResponseEntity.ok("Deleted");
     }
 
 

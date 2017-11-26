@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.CONFLICT)
 public class AchievementAlreadyExistsException extends RuntimeException {
     public AchievementAlreadyExistsException(Achievement o) {
-        super ("Achivement "+o.getDisplayName()+" for this game already exists");
+        super ("Achivement "+o.getDisplayName()+" for "+o.getGame().getDisplayName()+" already exists");
     }
 }
