@@ -1,5 +1,6 @@
 package achievements.enteties;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -7,41 +8,40 @@ import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.net.URI;
-import java.net.URL;
+
 import java.time.LocalDateTime;
 import java.util.Objects;
+import org.hibernate.validator.constraints.URL;
 
 @Entity
 public class Achievement {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
-    String id;
+    private String id;
 
-    @NotNull
-    @Size(min = 1, max = 100)
-    String displayName;
+    @NotNull(message = "ahc.error.displayname.notnull")
+    @Size(min = 1, max = 100, message = "ahc.error.displayname.size")
+    private String displayName;
 
-    @NotNull
-    @Size(max = 500)
-    String description;
+    @NotNull(message = "ahc.error.descritpion.notnull")
+    @Size(max = 500, message = "ahc.error.descritpion.size")
+    private String description;
 
-    URL icon;
+    @URL(message = "ahc.error.icon.invalidurl")
+    private String icon;
 
-    int displayOrder;
+    private int displayOrder;
 
-    @NotNull
-    @CreatedDate
-    LocalDateTime created;
+    @JsonIgnore
+    private LocalDateTime created;
 
-    @NotNull
-    @LastModifiedDate
-    LocalDateTime updated;
+    @JsonIgnore
+    private LocalDateTime updated;
 
-    @NotNull
     @ManyToOne
-    Game game;
+    @JsonIgnore
+    private Game game;
 
     public String getId() {
         return id;
@@ -67,11 +67,11 @@ public class Achievement {
         this.description = description;
     }
 
-    public URL getIcon() {
+    public String getIcon() {
         return icon;
     }
 
-    public void setIcon(URL icon) {
+    public void setIcon(String icon) {
         this.icon = icon;
     }
 
@@ -108,6 +108,17 @@ public class Achievement {
     }
 
     Achievement(){}
+
+    @PrePersist
+    public void onPrePersist() {
+        setCreated(LocalDateTime.now());
+        setUpdated(LocalDateTime.now());
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        setUpdated(LocalDateTime.now());
+    }
 
     @Override
     public boolean equals(Object o) {

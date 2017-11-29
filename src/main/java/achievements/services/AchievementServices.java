@@ -2,13 +2,11 @@ package achievements.services;
 
 import achievements.enteties.Game;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import achievements.repos.AchievementRepository;
 import achievements.enteties.Achievement;
 import achievements.repos.GameRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,10 +19,8 @@ public class AchievementServices{
     public String create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException, GameNotFoundException {
         Game achievementGame = gameRepository.findById(gameId)
                             .orElseThrow(()->new GameNotFoundException());
+
         achievement.setGame(achievementGame);
-        //This part should go to EventListener?
-        achievement.setCreated(LocalDateTime.now());
-        achievement.setUpdated(LocalDateTime.now());
 
         if (!(this.alreadyExists(achievement))) {
             achievement = achievementRepository.save(achievement);
@@ -33,26 +29,26 @@ public class AchievementServices{
         else throw new AchievementAlreadyExistsException(achievement);
     }
 
-    public Achievement update (Achievement updAchievement, String updId)
+    public Achievement update (Achievement updatedAchievement, String updId)
                                             throws AchievementAlreadyExistsException, AchievementNotFoundException {
-        //this should go to EventListener?
-        updAchievement.setUpdated(LocalDateTime.now());
-        //--------------------------------------------
-        if (!(this.alreadyExists(updAchievement))) {
-            Achievement existsing = achievementRepository.findById(updId)
-                    .orElseThrow(()->new AchievementNotFoundException());
-            //Because it will probably be changed to use DTOs:
-            updAchievement.setId(updId);
-            updAchievement.setCreated(existsing.getCreated());
-            return achievementRepository.save(updAchievement);
+
+        Achievement existing = achievementRepository.findById(updId)
+                .orElseThrow(()->new AchievementNotFoundException());
+        //Ovo prebaciti u DTO:
+        updatedAchievement.setGame(existing.getGame());
+        updatedAchievement.setId(updId);
+        updatedAchievement.setCreated(existing.getCreated());
+        //
+        if (!(this.alreadyExists(updatedAchievement))) {
+            return achievementRepository.save(updatedAchievement);
         }
-        else throw new AchievementAlreadyExistsException(updAchievement);
+        else throw new AchievementAlreadyExistsException(updatedAchievement);
     }
 
     public void delete (String achievementId){
         achievementRepository.delete( achievementId);
     }
-//list all achivements for given game ID
+
     public List<Achievement> getAllByGameSorted(String gameId){
         if(this.gameRepository.exists(gameId)) {
             return this.achievementRepository.findByGame_IdOrderByDisplayOrderAscCreatedAsc(gameId);
@@ -61,11 +57,11 @@ public class AchievementServices{
     }
 
     public Achievement getOne (String achievmentId){
-        if(this.achievementRepository.exists(achievmentId)) {
-            return this.achievementRepository.findOne(achievmentId);
-        }
-        else throw new AchievementNotFoundException();
+        return achievementRepository.findById(achievmentId)
+                .orElseThrow(()->new AchievementNotFoundException());
+
     }
+
 //checks if achievement with same name for the same game already exists
     private boolean alreadyExists(Achievement check) {
         return this.achievementRepository

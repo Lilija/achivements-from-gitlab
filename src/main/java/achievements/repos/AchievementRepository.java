@@ -2,6 +2,7 @@ package achievements.repos;
 
 import achievements.enteties.Achievement;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AchievementRepository extends CrudRepository<Achievement, String> {
+public interface AchievementRepository extends JpaRepository<Achievement, String> {
 
     List<Achievement> findByGame_IdOrderByDisplayOrderAscCreatedAsc (String gameId);
     List<Achievement> findByGame_Id (String gameId);
