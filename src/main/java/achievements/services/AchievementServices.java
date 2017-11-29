@@ -15,13 +15,12 @@ public class AchievementServices{
     private AchievementRepository achievementRepository;
     @Autowired
     private GameRepository gameRepository;
+
 //takes achievement from HTTP body and gameId from path and returns Id of created achievement
     public String create(Achievement achievement, String gameId) throws AchievementAlreadyExistsException, GameNotFoundException {
         Game achievementGame = gameRepository.findById(gameId)
                             .orElseThrow(()->new GameNotFoundException());
-
         achievement.setGame(achievementGame);
-
         if (!(this.alreadyExists(achievement))) {
             achievement = achievementRepository.save(achievement);
             return achievement.getId();

@@ -6,6 +6,7 @@ import achievements.services.GameNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -19,14 +20,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/game/{gameId}")
+@RequestMapping(value = "/game/{gameId}", produces={MediaType.APPLICATION_JSON_VALUE})
 @EntityScan(basePackageClasses = {Application.class, Jsr310JpaConverters.class})
 public class AchievementController {
 
     @Autowired
    private  AchievementServices achievementServices;
 
-@GetMapping("/achievements")
+@GetMapping("/achievements" )
     public  List<Achievement> listAllAchievements (@PathVariable String gameId){
           return achievementServices.getAllByGameSorted(gameId);
     }
@@ -58,14 +59,15 @@ public class AchievementController {
                 URI location = ServletUriComponentsBuilder
                         .fromCurrentRequest().path("/{achievementId}")
                         .buildAndExpand(achievement.getId() ).toUri();
-                return ResponseEntity.created(location).build();
+                return ResponseEntity.ok(location);
             }
             return ResponseEntity.noContent().build();
         }
 
         @DeleteMapping("/achievements/{achievementId}")
-        public void deleteAchievement (@PathVariable String achievementId) {
+        public ResponseEntity<?> deleteAchievement (@PathVariable String achievementId) {
         achievementServices.delete(achievementId);
+        return ResponseEntity.ok().build();
     }
 
 

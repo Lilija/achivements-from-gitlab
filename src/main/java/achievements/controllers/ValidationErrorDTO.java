@@ -22,23 +22,12 @@ public class ValidationErrorDTO {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public String getFieldName() {
         return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
     }
 
     public String getObjectName() {
         return objectName;
     }
 
-    public void setObjectName(String objectName) {
-        this.objectName = objectName;
-    }
 }
