@@ -1,9 +1,10 @@
 package achievements.enteties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -18,35 +19,40 @@ public class Achievement {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid2")
+    @JsonIgnore//id is used just with serialization
     private String id;
 
-    @NotNull(message = "ahc.error.displayname.notnull")
-    @Size(min = 1, max = 100, message = "ahc.error.displayname.size")
+    @NotNull(message = "ach.error.displayname.notnull")
+    @Size(min = 1, max = 100, message = "ach.error.displayname.size")
     private String displayName;
 
-    @NotNull(message = "ahc.error.descritpion.notnull")
-    @Size(max = 500, message = "ahc.error.descritpion.size")
+    @NotNull(message = "ach.error.descritpion.notnull")
+    @Size(min=1, max = 500, message = "ahc.error.descritpion.size")
     private String description;
 
-    @URL(message = "ahc.error.icon.invalidurl")
+    @URL(message = "ach.error.icon.invalidurl")
     private String icon;
 
-    private int displayOrder;
+    @Range(min =0, max = Integer.MAX_VALUE, message = "ach.error.displayOrder.range")
+    private int displayOrder = 1 ;
 
     @JsonIgnore
+    @Column(nullable = false)
     private LocalDateTime created;
 
     @JsonIgnore
+    @Column(nullable = false)
     private LocalDateTime updated;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JsonIgnore
     private Game game;
 
+@JsonProperty("id")
     public String getId() {
-        return id;
+        return this.id;
     }
-
+@JsonIgnore
     public void setId(String id) {
         this.id = id;
     }
@@ -92,12 +98,10 @@ public class Achievement {
     }
 
     public LocalDateTime getUpdated() {
-        return updated;
+        return this.updated;
     }
 
-    public void setUpdated(LocalDateTime updated) {
-        this.updated = updated;
-    }
+    public void setUpdated(LocalDateTime updated) { this.updated = updated; }
 
     public Game getGame() {
         return this.game;

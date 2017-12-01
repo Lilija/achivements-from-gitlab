@@ -14,7 +14,7 @@ public class Game {
     private String id;
     @NotNull
     private String displayName;
-    @OneToMany(mappedBy = "game")
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
     List<Achievement> achievements;
 
     public String getId() {
@@ -24,7 +24,6 @@ public class Game {
     public String setId(String id) {
         return this.id = id;
     }
-
 
     public String getDisplayName() {
         return displayName;

@@ -25,7 +25,7 @@ public class ControllerValidationHandler {
         private MessageSource msgSource;
 
         private Locale currentLocale = LocaleContextHolder.getLocale();
-
+        @ResponseBody
         @ExceptionHandler(MethodArgumentNotValidException.class)
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         public ResponseEntity<List<ValidationErrorDTO>>  processValidationError(MethodArgumentNotValidException ex) {
