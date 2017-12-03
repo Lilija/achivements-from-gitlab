@@ -1,7 +1,6 @@
 package achievements.enteties;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.Range;
@@ -34,7 +33,7 @@ public class Achievement {
     private String icon;
 
     @Range(min =0, max = Integer.MAX_VALUE, message = "ach.error.displayOrder.range")
-    private int displayOrder = 1 ;
+    private int displayOrder ;
 
     @JsonIgnore
     @Column(nullable = false)
@@ -81,12 +80,14 @@ public class Achievement {
         this.icon = icon;
     }
 
-    public int getDisplayOrder() {
-        return displayOrder;
-    }
+    public int getDisplayOrder() {    return displayOrder;    }
 
+//sets 1 for default value
     public void setDisplayOrder(int displayOrder) {
-        this.displayOrder = displayOrder;
+        if (displayOrder == 0){
+            this.displayOrder = 1;
+        }
+            else this.displayOrder = displayOrder;
     }
 
     public LocalDateTime getCreated() {

@@ -26,7 +26,7 @@ public interface AchievementRepository extends JpaRepository<Achievement, String
     void deleteAllByGameId (@Param("gameId")String gameId);
 
     @Query("SELECT 1 FROM Achievement a"+
-            " where displayName = :displayName"+
+            " where lower(replace(displayName,' ','')) = lower(replace(:displayName, ' ', ''))"+
             " and game.id=:gameId"+
             " and (:achievementId=null or id != :achievementId)")
     Optional<Integer> achievementForGameAlreadyExists (@Param("achievementId") String achievementId,
